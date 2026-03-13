@@ -29,6 +29,8 @@ class ProductController extends Controller
     // Guardar producto
     public function store(Request $request)
     {
+        $this->authorize('isAdmin');
+
         $request->validate([
             'name'        => 'required',
             'description' => 'required',
@@ -69,6 +71,8 @@ class ProductController extends Controller
     // Actualizar producto
     public function update(Request $request, Product $product)
     {
+        $this->authorize('isAdmin');
+
         $request->validate([
             'name'        => 'required',
             'description' => 'required',
