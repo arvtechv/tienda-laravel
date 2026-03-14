@@ -93,29 +93,12 @@
                 <button class="filter-tab-new" onclick="filterProducts('linea_blanca', this)">Linea Blanca</button>
             </div>
 
-            {{-- GRID DE PRODUCTOS --}}
-            <div class="product-grid">
-                @forelse($products as $product)
-                <div class="product-card-new">
-                    <a href="{{ route('products.show', $product) }}" style="text-decoration:none;">
-                        @if($product->image)
-                            <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}">
-                        @else
-                            <div style="width:100%; height:140px; background:#dde0e8; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:2rem; margin-bottom:10px;">📦</div>
-                        @endif
-                        <div class="p-name">{{ $product->name }}</div>
-                        <div class="p-price">$ {{ number_format($product->price, 0) }}</div>
-                    </a>
-                    <form action="{{ route('cart.add', $product) }}" method="POST">
-                        @csrf
-                        <button class="btn-agregar-card">Agregar</button>
-                    </form>
-                </div>
-                @empty
-                <div style="grid-column:span 4; text-align:center; color:#9CA3AF; padding:40px;">
-                    No hay productos aún.
-                </div>
-                @endforelse
+            {{-- GRID DE PRODUCTOS (REACT) --}}
+            <div id="react-product-grid"
+                 data-products="{{ json_encode($products->items()) }}"
+                 data-csrf-token="{{ csrf_token() }}"
+                 data-cart-url="{{ route('cart.add', 'ID_PLACEHOLDER') }}"
+                 data-show-url="{{ route('products.show', 'ID_PLACEHOLDER') }}">
             </div>
 
             {{-- PAGINACION --}}
@@ -188,7 +171,62 @@
 @endauth
 @endsection
 
+@endsection
+
 @section('scripts')
+<!-- React & ReactDOM -->
+<script src="https://unpkg.com/react@17/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js" crossorigin></script>
+<!-- Babel para compilar JSX en el navegador -->
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<script type="text/babel">
+    function ProductGrid({ products, csrfToken, addCartUrlTemplate, showUrlTemplate }) {
+        return (
+            <div className="product-grid">
+                {products.length > 0 ? products.map(product => (
+                    <div className="product-card-new" key={product.id}>
+                        <a href={showUrlTemplate.replace('ID_PLACEHOLDER', product.id)} style={{textDecoration: 'none'}}>
+                            {product.image ? (
+                                <img src={`/storage/${product.image}`} alt={product.name} />
+                            ) : (
+                                <div style={{width:'100%', height:'140px', background:'#dde0e8', borderRadius:'8px', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'2rem', marginBottom:'10px'}}>📦</div>
+                            )}
+                            <div className="p-name">{product.name}</div>
+                            <div className="p-price">$ {product.price.toLocaleString()}</div>
+                        </a>
+                        <form action={addCartUrlTemplate.replace('ID_PLACEHOLDER', product.id)} method="POST">
+                            <input type="hidden" name="_token" value={csrfToken} />
+                            <button className="btn-agregar-card">Agregar</button>
+                        </form>
+                    </div>
+                )) : (
+                    <div style={{gridColumn: 'span 4', textAlign: 'center', color: '#9CA3AF', padding: '40px'}}>
+                        No hay productos aún.
+                    </div>
+                )}
+            </div>
+        );
+    }
+
+    if (document.getElementById('react-product-grid')) {
+        const el = document.getElementById('react-product-grid');
+        const products = JSON.parse(el.getAttribute('data-products'));
+        const csrfToken = el.getAttribute('data-csrf-token');
+        const addCartUrlTemplate = el.getAttribute('data-cart-url');
+        const showUrlTemplate = el.getAttribute('data-show-url');
+        
+        ReactDOM.render(
+            <ProductGrid 
+                products={products} 
+                csrfToken={csrfToken} 
+                addCartUrlTemplate={addCartUrlTemplate}
+                showUrlTemplate={showUrlTemplate}
+            />, 
+        el);
+    }
+</script>
+
 <script>
 // Búsqueda en tabla admin
 document.getElementById('searchInput')?.addEventListener('input', function() {
