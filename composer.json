@@ -24,14 +24,14 @@
         "nunomaduro/collision": "^4.3",
         "phpunit/phpunit": "^8.5.8|^9.3.3"
     },
-    "config": {
-        "optimize-autoloader": true,
-        "preferred-install": "dist",
-        "sort-packages": true,
-        "platform": {
-        "php": "8.2"
+"config": {
+    "optimize-autoloader": true,
+    "preferred-install": "dist",
+    "sort-packages": true,
+    "platform": {
+        "php": "8.2.30"
     }
-    },
+},
     "extra": {
         "laravel": {
             "dont-discover": []
