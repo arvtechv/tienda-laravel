@@ -15,7 +15,8 @@
         "laravel/framework": "^8.0",
         "laravel/tinker": "^2.5",
         "laravel/ui": "3.4",
-        "spatie/laravel-permission": "5.0"
+        "spatie/laravel-permission": "5.0",
+        "symfony/css-selector": "7.0"
     },
     "require-dev": {
         "facade/ignition": "^2.0",
