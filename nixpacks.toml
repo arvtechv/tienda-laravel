@@ -8,4 +8,4 @@ cmds = ["composer update --no-dev --optimize-autoloader --ignore-platform-reqs"]
 cmds = ["php artisan config:clear", "php artisan view:cache"]
 
 [start]
-cmd = "php artisan config:clear && (php artisan migrate --force || true) && php -S 0.0.0.0:$PORT -t public"
+cmd = "php artisan config:clear && php artisan migrate --force && php -S 0.0.0.0:$PORT -t public"

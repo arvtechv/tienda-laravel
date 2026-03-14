@@ -8,14 +8,14 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^7.2.5|^8.2",
+        "php": "^8.2",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^6.3.1|^7.0.1",
-        "laravel/framework": "^7.29",
+        "laravel/framework": "^8.0",
         "laravel/tinker": "^2.5",
-        "laravel/ui": "2.0",
-        "spatie/laravel-permission": "3.18"
+        "laravel/ui": "3.4",
+        "spatie/laravel-permission": "5.0"
     },
     "require-dev": {
         "facade/ignition": "^2.0",
@@ -37,11 +37,7 @@
     "autoload": {
         "psr-4": {
             "App\\": "app/"
-        },
-        "classmap": [
-            "database/seeds",
-            "database/factories"
-        ]
+        }
     },
     "autoload-dev": {
         "psr-4": {
