@@ -1,80 +1,37 @@
 @extends('layouts.app')
 
 @section('content')
-@auth
-    @if(auth()->user()->hasRole('admin'))
-    {{-- VISTA ADMIN: TABLA --}}
-    <div class="content-card">
-        <div class="content-header">Productos</div>
-        <div class="content-body">
+<div class="container">
 
-            <div style="display:flex; justify-content:flex-end; align-items:center; margin-bottom:16px; gap:10px;">
-                <label style="font-size:0.9rem; color:#686B75;">Buscar</label>
-                <div style="position:relative;">
-                    <input type="text" id="searchInput" placeholder="Buscar..."
-                           style="border:1px solid #e5e7eb; border-radius:8px; padding:8px 36px 8px 14px; font-size:0.9rem; outline:none;">
-                    <span style="position:absolute; right:10px; top:50%; transform:translateY(-50%); color:#686B75;">🔍</span>
-                </div>
-            </div>
+    @if(session('success'))
+        <div class="alert alert-success mt-3">{{ session('success') }}</div>
+    @endif
 
-            <table class="table-custom">
-                <thead>
-                    <tr>
-                        <th>Imagen</th>
-                        <th>Nombre ↕</th>
-                        <th>Precio ↕</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="productTable">
-                    @forelse($products as $product)
-                    <tr>
-                        <td>
-                            @if($product->image)
-                                <img src="{{ asset('storage/' . $product->image) }}"
-                                     style="width:56px; height:42px; object-fit:cover; border-radius:6px;">
-                            @else
-                                <div style="width:56px; height:42px; background:#ECEEF3; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">📦</div>
-                            @endif
-                        </td>
-                        <td>{{ $product->name }}</td>
-                        <td class="price-red">$ {{ number_format($product->price, 0) }}</td>
-                        <td>
-                            <a href="{{ route('products.edit', $product) }}" class="btn-edit">
-                                📅 Editar
-                            </a>
-                            <form action="{{ route('products.destroy', $product) }}" method="POST"
-                                  style="display:inline" onsubmit="return confirm('¿Eliminar?')">
-                                @csrf @method('DELETE')
-                                <button class="btn-delete">🗑 Eliminar</button>
-                            </form>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="4" style="text-align:center; color:#9CA3AF; padding:40px;">
-                            No hay productos aún.
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
+    {{-- HERO --}}
+    <div class="hero-section">
+        <div class="hero-badge">
+            🖥️ La mejor tecnología al mejor precio
+        </div>
+        <h1 class="hero-title">TechStore</h1>
+        <p class="hero-subtitle">Computadoras, periféricos y accesorios de las mejores marcas con envío rápido.</p>
+    </div>
 
-            {{-- PAGINACION --}}
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
-                <div style="font-size:0.85rem; color:#686B75;">
-                    <select style="border:1px solid #e5e7eb; border-radius:6px; padding:4px 8px;">
-                        <option>20</option>
-                        <option>50</option>
-                        <option>100</option>
-                    </select>
-                    Registros Visibles
-                </div>
-                <div class="pagination-custom">
-                    {{ $products->links() }}
-                </div>
-            </div>
-
+    {{-- FILTROS --}}
+    <div class="filter-bar">
+        <div class="filter-tabs">
+            <button class="filter-tab active">Todos</button>
+            <button class="filter-tab">Computadoras</button>
+            <button class="filter-tab">Mouse</button>
+            <button class="filter-tab">Teclados</button>
+            <button class="filter-tab">Monitores</button>
+            <button class="filter-tab">Accesorios</button>
+        </div>
+        <div class="search-box">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <input type="text" placeholder="Buscar productos...">
         </div>
     </div>
 
@@ -93,12 +50,29 @@
                 <button class="filter-tab-new" onclick="filterProducts('linea_blanca', this)">Linea Blanca</button>
             </div>
 
-            {{-- GRID DE PRODUCTOS (REACT) --}}
-            <div id="react-product-grid"
-                 data-products="{{ json_encode($products->items()) }}"
-                 data-csrf-token="{{ csrf_token() }}"
-                 data-cart-url="{{ route('cart.add', 'ID_PLACEHOLDER') }}"
-                 data-show-url="{{ route('products.show', 'ID_PLACEHOLDER') }}">
+            {{-- GRID DE PRODUCTOS --}}
+            <div class="product-grid">
+                @forelse($products as $product)
+                <div class="product-card-new">
+                    <a href="{{ route('products.show', $product) }}" style="text-decoration:none;">
+                        @if($product->image)
+                            <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}">
+                        @else
+                            <div style="width:100%; height:140px; background:#dde0e8; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:2rem; margin-bottom:10px;">📦</div>
+                        @endif
+                        <div class="p-name">{{ $product->name }}</div>
+                        <div class="p-price">$ {{ number_format($product->price, 0) }}</div>
+                    </a>
+                    <form action="{{ route('cart.add', $product) }}" method="POST">
+                        @csrf
+                        <button class="btn-agregar-card">Agregar</button>
+                    </form>
+                </div>
+                @empty
+                <div style="grid-column:span 4; text-align:center; color:#9CA3AF; padding:40px;">
+                    No hay productos aún.
+                </div>
+                @endforelse
             </div>
 
             {{-- PAGINACION --}}
@@ -114,50 +88,11 @@
                 </div>
             </div>
         </div>
-
-        {{-- CARRITO LATERAL --}}
-        @php
-            $cartItems = \App\CartItem::where('user_id', auth()->id())->with('product')->get();
-            $total = $cartItems->sum(fn($i) => $i->product->price * $i->quantity);
-        @endphp
-        @if($cartItems->count() > 0)
-        <div class="cart-sidebar">
-            <h5>Mi carrito</h5>
-            @foreach($cartItems as $item)
-            <div class="cart-item-row">
-                @if($item->product->image)
-                    <img src="{{ asset('storage/' . $item->product->image) }}">
-                @else
-                    <div style="width:50px; height:40px; background:#ECEEF3; border-radius:6px; display:flex; align-items:center; justify-content:center;">📦</div>
-                @endif
-                <div class="cart-item-info">
-                    <div class="name">{{ $item->product->name }}</div>
-                    <div class="price">$ {{ number_format($item->product->price, 0) }}</div>
-                </div>
-                <div class="qty-controls">
-                    <form action="{{ route('cart.update', $item) }}" method="POST" style="display:inline">
-                        @csrf @method('PUT')
-                        <input type="hidden" name="quantity" value="{{ max(1, $item->quantity - 1) }}">
-                        <button class="qty-btn">−</button>
-                    </form>
-                    {{ $item->quantity }}
-                    <form action="{{ route('cart.update', $item) }}" method="POST" style="display:inline">
-                        @csrf @method('PUT')
-                        <input type="hidden" name="quantity" value="{{ $item->quantity + 1 }}">
-                        <button class="qty-btn">+</button>
-                    </form>
-                </div>
+        @empty
+            <div class="col-12 text-center py-5">
+                <p class="text-muted">No hay productos aún.</p>
             </div>
-            @endforeach
-
-            <div class="cart-total">
-                <span>Total</span>
-                <span>${{ number_format($total, 0) }}</span>
-            </div>
-
-            <button class="btn-primary-custom" style="margin-top:16px;">Comprar ahora</button>
-        </div>
-        @endif
+        @endforelse
     </div>
     @endif
 @else
@@ -172,59 +107,6 @@
 @endsection
 
 @section('scripts')
-<!-- React & ReactDOM -->
-<script src="https://unpkg.com/react@17/umd/react.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js" crossorigin></script>
-<!-- Babel para compilar JSX en el navegador -->
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-<script type="text/babel">
-    function ProductGrid({ products, csrfToken, addCartUrlTemplate, showUrlTemplate }) {
-        return (
-            <div className="product-grid">
-                {products.length > 0 ? products.map(product => (
-                    <div className="product-card-new" key={product.id}>
-                        <a href={showUrlTemplate.replace('ID_PLACEHOLDER', product.id)} style={{textDecoration: 'none'}}>
-                            {product.image ? (
-                                <img src={`/storage/${product.image}`} alt={product.name} />
-                            ) : (
-                                <div style={{width:'100%', height:'140px', background:'#dde0e8', borderRadius:'8px', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'2rem', marginBottom:'10px'}}>📦</div>
-                            )}
-                            <div className="p-name">{product.name}</div>
-                            <div className="p-price">$ {product.price.toLocaleString()}</div>
-                        </a>
-                        <form action={addCartUrlTemplate.replace('ID_PLACEHOLDER', product.id)} method="POST">
-                            <input type="hidden" name="_token" value={csrfToken} />
-                            <button className="btn-agregar-card">Agregar</button>
-                        </form>
-                    </div>
-                )) : (
-                    <div style={{gridColumn: 'span 4', textAlign: 'center', color: '#9CA3AF', padding: '40px'}}>
-                        No hay productos aún.
-                    </div>
-                )}
-            </div>
-        );
-    }
-
-    if (document.getElementById('react-product-grid')) {
-        const el = document.getElementById('react-product-grid');
-        const products = JSON.parse(el.getAttribute('data-products'));
-        const csrfToken = el.getAttribute('data-csrf-token');
-        const addCartUrlTemplate = el.getAttribute('data-cart-url');
-        const showUrlTemplate = el.getAttribute('data-show-url');
-        
-        ReactDOM.render(
-            <ProductGrid 
-                products={products} 
-                csrfToken={csrfToken} 
-                addCartUrlTemplate={addCartUrlTemplate}
-                showUrlTemplate={showUrlTemplate}
-            />, 
-        el);
-    }
-</script>
-
 <script>
 // Búsqueda en tabla admin
 document.getElementById('searchInput')?.addEventListener('input', function() {
