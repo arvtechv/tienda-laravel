@@ -171,8 +171,6 @@
 @endauth
 @endsection
 
-@endsection
-
 @section('scripts')
 <!-- React & ReactDOM -->
 <script src="https://unpkg.com/react@17/umd/react.production.min.js" crossorigin></script>
